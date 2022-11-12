@@ -84,7 +84,7 @@ cooh.ev.on("messages.upsert", async ({ messages }) => {
 try {
 const info = messages[0]
 if (!info.message) return 
-await cooh.readMessages(info.key.remoteJid, [info.key.id] info.key.participant)
+await cooh.readMessages(info.key.remoteJid, [info.key.id], info.key.participant)
 if (info.key && info.key.remoteJid == "status@broadcast") return
 const altpdf = Object.keys(info.message)
 const type = altpdf[0] == "senderKeyDistributionMessage" ? altpdf[1] == "messageContextInfo" ? altpdf[2] : altpdf[1] : altpdf[0]
