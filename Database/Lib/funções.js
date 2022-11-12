@@ -26,7 +26,7 @@ if(i.admin == "superadmin") admins.push(i.id)
 return admins
 }
 
-const banner = cfonts.render(("Asta|md"), {
+const banner = cfonts.render(("A04Corp|MD"), {
 font: "block",
 align: "center",
 colors: [`${cor1}`,`${cor2}`],

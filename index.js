@@ -1,5 +1,4 @@
-require("./arquivos/configurações/dados")
-const { 
+require('dotenv').config()
 default: makeWASocket,
 makeInMemoryStore,
 useSingleFileAuthState,
@@ -24,17 +23,15 @@ const data = moment.tz("America/Sao_Paulo").format("DD/MM/YY")
 const speed = require("performance-now")
 const { banner, getGroupAdmins, getBuffer, getRandom, getExtension, upload } = require("./Database/Lib/funções")
 const { fetchJson } = require("./Database/Lib/fetcher")
-const configurações = JSON.parse(fs.readFileSync("./Database/Json/dados.json"))
 const registros = JSON.parse(fs.readFileSync("./Database/Json/registros.json"))
 const { menu } = require("./Database/Menus/menu.js")
-const img = JSON.parse(fs.readFileSync("./Database/Fotos/logo.json"))
 
-logo = img.logo
-prefixo = configurações.prefixo
-nomeBot = configurações.nomeBot
-numeroBot = configurações.numeroBot
-nomeDono = configurações.nomeDono
-numeroDono = configurações.numeroDono
+logo = process.env.logo
+prefixo = process.env.prefixo
+nomeBot = process.env.nomeBot
+numeroBot = process.env.numeroBot
+nomeDono = process.env.nomeDono
+numeroDono = process.env.numeroDono
 
 // Função do ping
 let girastamp = speed()
@@ -259,405 +256,33 @@ if (!isCmd && isGroup && sender) console.log(`\x1b[1;37m \n\x1b[1;37m  Número: 
 // Começo dos comandos com prefix
 switch(comando) {
 
-case "registrar":
-case "rg":
-if (isRegistro) return enviar(resposta.norg)
-try {
-registros.push(sender)
-fs.writeFileSync("./arquivos/lib/registros.json",JSON.stringify(registros))
-} catch(e) {
-console.log(e)
-enviar(resposta.erro)
-}
-enviar(`[⚙️️] Registrado com sucesso [❗]
-
-📝 Nome: ${pushname}
-📅 Data: ${data}
-🕛 Horário: ${hora}
-
-🎉🎈 Parabéns por se registrar 🎈🎉`)
-break
-
 case "menu":
-case "help":
-case "comandos":
-if (!isRegistro) return enviar(resposta.registro)
-enviar(resposta.espere)
-menump3 = fs.readFileSync("./arquivos/audios/menu.mp3")
-cooh.sendMessage(from,
-{audio: menump3, mimetype: "audio/mp4", ptt:true}, 
-{quoted: verificado})
-enviarImgB(from, `${logo}`,
-menu(prefixo, nomeBot, numeroDono, nomeDono, hora, data, pushname, sender),
-"Leia com atenção",
-[
-{buttonId: `${prefixo}perfil`,
-buttonText: {displayText: `🏵️ Perfil 🏵️`}, type: 1},
-{buttonId: `${prefixo}dono`,
-buttonText: {displayText: `👑 Dono 👑️`}, type: 1},
-{buttonId: `${prefixo}ping`,
-buttonText: {displayText: `⚡ Ping ⚡`}, type: 1}],
-verificado)
-break
+   if(!isGroup) return enviar(resposta.grupo)
+   enviar(`${menu(prefixo, nomeBot, numeroDono, nomeDono, hora, data, pushname, sender.split("@")[0])}`)
+   
+   /*   
+      =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+      
+      × isGroup =-> Se Estiver Dentro Do Grupo
+      × ! =-> Caso Ao Contrário
 
-case "toimg":
-if (!isRegistro) return enviar(resposta.registro)
-if (!isQuotedSticker) return enviar("[⚙️] Marca uma fig, seu animal [❗]")
-buff = await getFileBuffer(info.message.extendedTextMessage.contextInfo.quotedMessage.stickerMessage, "sticker")
-enviar(resposta.espere)
-try {
-cooh.sendMessage(from, {image: buff}, {quoted: verificado})
-} catch(e) {
-console.log(e)
-enviar(resposta.erro)
-}
-break
+      × No Caso Em Escrita Seria: Se (if) O Comando Não For Executado Em Um Grupo, Envie Uma Mensagem Na Variável resposta Na Opção grupo (resposta.grupo)
+      
+      =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+      
+      × enviar =-> Uma Variável Setada Para Enviar Mensagem
 
-case "perfil":
-if (!isRegistro) return enviar(resposta.registro)
-try {
-ppimg = await cooh.profilePictureUrl(`${sender.split("@")[0]}@c.us`, "image")
-} catch(e) {
-ppimg = logo
-}
-perfil = await getBuffer(ppimg)
-enviar(resposta.espere)
-try {
-cooh.sendMessage(from, {
-image: perfil,
-caption: `
-[⚙️] Aqui está suas informações [❗]
+      × Você Também Pode Executar Sem Uma Variável, Basta Troca-lo Por Esse Comando:
+      
+      cooh.sendMessage(from, { text: `${menu(prefixo, nomeBot, numeroDono, nomeDono, hora, data, pushname, sender.split("@")[0])}` }, { quoted: info })
+      
+      =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+   */
 
-📝 Nome: ${pushname}
-📅 Data: ${data}
-🕛 Horário: ${hora}
-📱 Número: ${sender.split("@")[0]}
-🔰 Wa.me: https://wa.me/${sender.split("@")[0]}
-👥 Grupo: ${groupName}
-`
-}, {quoted: verificado})
-} catch(e) {
-console.log(e)
-enviar(resposta.erro)
-}
-break
-
-case "play":
-qp = args.join(" ")
-res = await yts(qp)
-enviar(resposta.espere)
-blaimg = await getBuffer(res.all[0].image)
-
-bla = `☂️ Titulo: ${res.all[0].title}\n📉 Visualizações: ${res.all[0].views}\n⏰ Tempo: ${res.all[0].timestamp}\n🔎 Canal: ${res.all[0].author.name}\n ⚙️ Se você não conseguir visualizar os botões, execute o playaudio, playvideo como segunda opção.`
-
-enviarImgB(from, `${res.all[0].image}`, bla, nomeBot, [
-{buttonId: `${prefixo}playaudio ${qp}`, buttonText: {displayText: `🎵 Audio`}, type: 1}, {buttonId: `${prefixo}playvideo ${qp}`, buttonText: {displayText: `🎥 Video`}, type: 1}], info)
-break
-
-case "playaudio":
-enviar(resposta.espere)
-bla = await fetchJson(`https://api-team-of-hero.herokuapp.com/api/yt/playmp4?apikey=apiteam&query=${q}`) 
-audbla = await getBuffer(bla.url)
-cooh.sendMessage(from, {audio: audbla, mimetype: "audio/mp4"}, {quoted: info}).catch(e => {
-enviar(resposta.erro)
-})
-break
-
-case "playvideo":
-enviar(resposta.espere)
-bla = await fetchJson(`https://api-team-of-hero.herokuapp.com/api/yt/playmp4?apikey=apiteam&query=${q}`) 
-audbla = await getBuffer(bla.url)
-cooh.sendMessage(from, {video: audbla, mimetype: "video/mp4"}, {quoted: info}).catch(e => {
-enviar(resposta.erro)
-})
-break
-
-case "telegra.ph":    
-try {
-if (isQuotedImage) {
-enviar(resposta.espere)
-boij = isQuotedImage || isQuotedVideo ? JSON.parse(JSON.stringify(info).replace("quotedM","m")).message.extendedTextMessage.contextInfo.message.imageMessage : info
-owgi = await getFileBuffer(boij, "image")
-res = await upload(owgi)
-enviar(res)
-} else {
-enviar("[⚙️] Marque uma imagem, seu baitola [❗]")
-}
-} catch(e) {
-console.log(e)
-enviar(resposta.erro)
-}
-break
-
-case "dono":
-if (!isRegistro) return enviar(resposta.registro)
-enviar(resposta.espere)
-await delay(5000)
-try {
-cooh.sendMessage(from, { contacts: { displayName: "Kawã", contacts: [{ vcard }]
-}})
-} catch(e) {
-console.log(e)
-enviar(resposta.erro)
-}
-break
-
-case "ping":
-if (!isOwner) return enviar(resposta.dono)
-if (!isRegistro) return enviar(resposta.registro)
-enviar(resposta.espere)
-enviar(`[⚙️] Velocidade de resposta ${latensi.toFixed(4)} segundos [❗]`)
-break
-
-case "sair":
-if (!isGroup) return enviar(resposta.grupo)
-if (!isRegistro) return enviar(resposta.registro)
-if (!isOwner) return enviar(resposta.dono)
-try {
-await cooh.groupLeave(from)
-} catch(e) {
-console.log(e)
-enviar(resposta.erro)
-}
-break
-
-case "executar":
-if (!isRegistro) return enviar(resposta.registro)
-if (!isOwner) return enviar(resposta.dono)
-if (q < 1) return enviar("[⚙️] Vou executar o vento? [❗]")
-try {
-ev = body.slice(comando.length + 2)
-JSON.stringify(eval(ev.replace("await", "")))
-} catch(e) {
-enviar(e)
-console.log(e)
-}
-break
-
-case "prefix":
-if (!isRegistro) return enviar(resposta.registro)
-if (!isOwner) return enviar(resposta.dono)
-if (q < 1) return enviar("[⚙️] Escolhe um simbolo, seu mongol [❗]")
-prefixo = args[0]
-configurações.prefixo = prefixo
-fs.writeFileSync("./arquivos/configurações/dados.json", JSON.stringify(configurações, null, "\t"))
-enviar(`[⚙️] O prefixo foi alterado com sucesso para: ${prefixo} [❗]`)
-break
-
-case "fotobot":
-if (!isRegistro) return enviar(resposta.registro)
-if (!isOwner) return enviar(resposta.dono)
-if (!isQuotedImage) return enviar("[⚙️] Marque uma foto, seu corno [❗]")
-buff = await getFileBuffer(info.message.extendedTextMessage.contextInfo.quotedMessage.imageMessage, "image")
-await cooh.updateProfilePicture(numeroBot, buff)
-enviar("[⚙️] Foto de perfil alterada com sucesso [❗]")
-break
-
-case "clonar":
-if (!isRegistro) return enviar(resposta.registro)
-if (!isOwner) return enviar(resposta.dono)
-if (q < 1) return enviar("[⚙️] Marque a pessoa, mongolóide [❗]")
-mentioned = info.message.extendedTextMessage.contextInfo.mentionedJid[0]
-let { jid, id, notify } = groupMembers.find(x => x.id === mentioned)
-try {
-pp = await cooh.profilePictureUrl(id, "image")
-buffer = await getBuffer(pp)
-cooh.updateProfilePicture(numeroBot, buffer)
-mentions(`[⚙️] Foto do perfil atualizada com sucesso, usando a foto do perfil @${id.split("@")[0]} [❗]`, [id], true)
-} catch (e) {
-console.log(e)
-enviar(resposta.erro)
-}
-break
-
-case "gplink":
-if (!isGroup) return enviar(resposta.grupo)
-if (!isRegistro) return enviar(resposta.registro)
-if (!groupAdmins) return enviar(resposta.adm)
-if (!isBotGroupAdmins) return enviar(resposta.botadm)
-const link = await cooh.groupInviteCode(from)
-enviar(`[⚙️] Link do grupo : https://chat.whatsapp.com/${link} [❗]`)
-break
-
-case "resetarlink":
-if (!isGroup) return enviar(resposta.grupo)
-if (!isRegistro) return enviar(resposta.registro)
-if (!groupAdmins) return enviar(resposta.adm)
-if (!isBotGroupAdmins) return enviar(resposta.botadm)
-try {
-await cooh.groupRevokeInvite(from)
-enviar("[⚙️] Link de convite resetado com sucesso ✓ [❗]")
-} catch(e) {
-console.log(e)
-enviar(resposta.erro)
-}
-break
-
-case "gp":
-case "grupo":
-if (!isGroup) return enviar(resposta.grupo)
-if (!isRegistro) return enviar(resposta.registro)
-if (!groupAdmins) return enviar(resposta.adm)
-if (!isBotGroupAdmins) return enviar(resposta.botadm)
-try {
-if (q == "abrir") {
-await cooh.groupSettingUpdate(from, "not_announcement")
-enviar("[⚙️] Grupo aberto com sucesso [❗]")
-}
-if (q == "fechar") {
-await cooh.groupSettingUpdate(from, "announcement")
-enviar("[⚙️] Grupo fechado com sucesso [❗]")
-}
-if (q == "livrar") {
-await cooh.groupSettingUpdate(from, "unlocked")
-enviar("[⚙️] Grupo livre com sucesso [❗]")
-}
-if (q == "limitar") {
-await cooh.groupSettingUpdate(from, "locked")
-enviar("[⚙️] Grupo limitado com sucesso [❗]")
-}
-} catch(e) {
-console.log(e)
-enviar(resposta.erro)
-}
-break
-
-case "infogp":
-if (!isGroup) return enviar(resposta.grupo)
-if (!isRegistro) return enviar(resposta.registro)
-if (!isBotGroupAdmins) return enviar(resposta.botadm)
-enviar(`
-📝 Nome : ${groupName}
-📃 Descrição : ${groupDesc}
-🆔 Id : ${from}
-📅 Data : ${data}
-🕛 Horário : ${hora}
-`)
-break
-
-case "mudardk":
-if (!isGroup) return enviar(resposta.grupo)
-if (!isRegistro) return enviar(resposta.registro)
-if (!groupAdmins) return enviar(resposta.adm)
-if (!isBotGroupAdmins) return enviar(resposta.botadm)
-try {
-await cooh.groupUpdateDescription(from, `${q}`)
-enviar("[⚙️] Descrição alterada com sucesso ✓ [❗]")
-} catch(e) {
-console.log(e)
-enviar(resposta.erro)
-}
-break
-
-case "mudarnm":
-if (!isGroup) return enviar(resposta.grupo)
-if (!isRegistro) return enviar(resposta.registro)
-if (!groupAdmins) return enviar(resposta.adm)
-if (!isBotGroupAdmins) return enviar(resposta.botadm)
-try {
-await cooh.groupUpdateSubject(from, `${q}`)
-enviar("[⚙️] Nome alterado com sucesso ✓ [❗]")
-} catch(e) {
-console.log(e)
-enviar(resposta.erro)
-}
-break
-
-case "rebaixar":
-if (!isGroup) return enviar(resposta.grupo)
-if (!isRegistro) return enviar(resposta.registro)
-if (!groupAdmins) return enviar(resposta.adm)
-if (q < 1) return enviar("[⚙️] Digite o número, animal [❗]")
-if (!isBotGroupAdmins) return enviar(resposta.botadm)
-try {
-cooh.groupParticipantsUpdate(from, [`${q}@s.whatsapp.net`], "demote")
-enviar(`[⚙️] ${q} Foi rebaixado a membro comum com sucesso [❗]`)
-} catch(e) {
-console.log(e)
-enviar(resposta.erro)
-}
-break
-
-case "promover":
-if (!isGroup) return enviar(resposta.grupo)
-if (!isRegistro) return enviar(resposta.registro)
-if (!groupAdmins) return enviar(resposta.adm)
-if (q < 1) return enviar("[⚙️] Cade o número, mongolóide [❗]")
-if (!isBotGroupAdmins) return enviar(resposta.botadm)
-try {
-cooh.groupParticipantsUpdate(from, [`${q}@s.whatsapp.net`], "promote")
-enviar(`[⚙️] ${q} Foi promovido a adm com sucesso [❗]`)
-} catch(e) {
-console.log(e)
-enviar(resposta.erro)
-}
-break
-
-case "adicionar":
-if (!isGroup) return enviar(resposta.grupo)
-if (!isRegistro) return enviar(resposta.registro)
-if(!isGroupAdmins) return enviar(resposta.adm)
-if (!isBotGroupAdmins) return enviar(resposta.botadm)
-if(q.length < 1) return enviar("[⚙️] Vou adicionar o vento blz? [❗]")  
-try {
-tdt = args[0]
-if(tdt.length < 1) return enviar(`[⚙️] Digita o número que deseja adicionar, exemplo: ${prefixo} 556699587805 [❗]`)
-if (info.message.extendedTextMessage === null || info.message.extendedTextMessage === undefined) {
-enviar("[⚙️] Irei adicionar ele(a) em 5 segundos... [❗]")  
-adduser = q.replace(new RegExp("[()+-/ +/]", "gi"), "") + `@s.whatsapp.net`
-await delay(5000)
-response = await cooh.groupParticipantsUpdate(from, [adduser], "add")
-o = response.participants[0]
-let inv = (Object.values(o))
-if(inv[0].code == 409) return enviar("[⚙️] O alvo já está no grupo [❗]")
-if(inv[0].code == 403) return enviar("[⚙️] Erro, conta privada do usuário [❗]")
-if(inv[0].code == 408) return enviar("[⚙️] rro, usuário acabou de sair [❗]")
-if(inv[0].code == 401) return enviar("[⚙️] Erro, porque o bot está bloqueado pelo alvo [❗]")
-if(tdt.includes(groupMembers.id.split("@")[0])) return enviar("[⚙️] Esse membro já está no grupo, como você vai adicionar??? [❗]")
-} else {
-enviar("[⚙️] Irei adicionar ele(a) em 5 segundos... [❗]")  
-await delay(5000)
-adduser = info.message.extendedTextMessage.contextInfo.participant
-response =  await cooh.groupParticipantsUpdate(from,[adduser], "add")
-o = response.participants[0]
-let inv = (Object.values(o))
-if(inv[0].code == 409) return enviar("[⚙️] O alvo já está no grupo [❗]")
-if(inv[0].code == 403) return enviar("[⚙️] Falhou, porque em privado [❗]")
-if(inv[0].code == 408) return enviar("[⚙️] Falha, porque o alvo acabou de sair [❗]")
-if(inv[0].code == 401) return enviar("[⚙️] Falha, porque o bot está bloqueado pelo alvo [❗]")
-}
-} catch {
-enviar("[⚙️] Pronto,  se não for adicionado provavelmente ele privou só para contatos adicionar ele em grupo. [❗]")
-}
-break
-
-case "banir":
-if (!isGroup) return enviar(resposta.grupo)
-if (!isGroupAdmins) return enviar(resposta.adm)
-if (!isBotGroupAdmins) return enviar(resposta.botadm)
-if (info.message.extendedTextMessage != undefined || info.message.extendedTextMessage != null) {
-num = info.message.extendedTextMessage.contextInfo.participant
-if(numeroBot.includes(num)) return enviar("[⚙️] felizmente não posso me auto remover, terá que fazer isso manualmente [❗]")
-if(numeroDono.includes(num)) return enviar("[⚙️] infelizmente não posso remover meu dono [❗]")
-cooh.sendMessage(from, {text: `[⚙️]Adeus ${num.split("@")[0]} [❗]`, mentions: [num]}, {quoted: info})
-cooh.groupParticipantsUpdate(from, [num], "remove")
-} else { 
-enviar("[⚙️] Marque a mensagem da pessoa [❗]")
-}
 break
 
 default:
 
-// Comandos sem prefix
-switch(testat){
-}
-
-// Resposta quando o comando não é encontrado
-if (isCmd) return enviar(`[⚙️] Comando não encontrado digite ${prefixo}menu para ver a lista de comandos disponíveis [❗]`)
-
-if (budy.includes("bot corno") || (budy.includes("Bot corno"))){
-enviar("Corno é você, seu animal")
-}
 }
 
 } catch (erro) {
