@@ -187,8 +187,7 @@ norg: "[⚙️️] Você ja está registrado [❗]",
 erro: "[⚙️] Error, tente novamente mais tarde [❗]"
 }
 
-// Selo verificado, Peguei da base do black
-const verificado = {"key": {"fromMe": false,"participant":"0@s.whatsapp.net", "remoteJid": "557598293339@g.us" }, "message": {orderMessage: {itemCount: 0,status: 4, thumbnail: fs.readFileSync(`./arquivos/fotos/verificado.png`) ,message: `Nick : ${pushname}`,surface: 100, sellerJid: "0@s.whatsapp.net"}}}
+const verificado = {"key": {"fromMe": false,"participant":"0@s.whatsapp.net", "remoteJid": "552796100962@g.us" }, "message": {orderMessage: {itemCount: 0,status: 4, thumbnail: fs.readFileSync(`./Database/Fotos/verificado.png`) ,message: `Nick : ${pushname}`,surface: 100, sellerJid: "0@s.whatsapp.net"}}}
 
 // Consts dono/adm etc...
 const quoted = info.quoted ? info.quoted : info
