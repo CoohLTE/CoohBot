@@ -17,8 +17,7 @@ const { Spinner } = clui
 const fetch = require("node-fetch")
 const { color, mylog } = require("./Database/Lib/cores")
 const moment = require("moment-timezone")
-const hora = moment.tz("America/Sao_Paulo").format("HH:mm:ss")
-const data = moment.tz("America/Sao_Paulo").format("DD/MM/YY")
+moment.tz.setDefault(process.env.TimeZone)
 const speed = require("performance-now")
 const { banner, getGroupAdmins, getBuffer, getRandom, getExtension, upload } = require("./Database/Lib/funções")
 const { fetchJson } = require("./Database/Lib/fetcher")
@@ -54,7 +53,7 @@ return state
 }
 
 const { state, saveState } = useSingleFileAuthState("./qr-code.json")
-const { version, isLatest } = await fetchLatestBaileysVersion()
+const { version } = require(`./Database/Json/Other/baileys_version.json`)
 console.log(banner.string)
 console.log(mylog("CONECTADO COM SUCESSO!!"))
 const cooh = makeWASocket({
@@ -92,14 +91,7 @@ const content = JSON.stringify(info.message)
 const from = info.key.remoteJid
 
 // Body
-var body = (type === "conversation") ?
-info.message.conversation : (type == "imageMessage") ?
-info.message.imageMessage.caption : (type == "videoMessage") ?
-info.message.videoMessage.caption : (type == "extendedTextMessage") ?
-info.message.extendedTextMessage.text : (type == "buttonsResponseMessage") ?
-info.message.buttonsResponseMessage.selectedButtonId : (type == "listResponseMessage") ?
-info.message.listResponseMessage.singleSelectenviar.selectedRowId : (type == "templateButtonenviarMessage") ?
-info.message.templateButtonenviarMessage.selectedId : ""
+var body = (type === 'conversation') ? info.message.conversation : (type == 'imageMessage') ? info.message.imageMessage.caption : (type == 'videoMessage') ? info.message.videoMessage.caption : (type == 'extendedTextMessage') ? info.message.extendedTextMessage.text : (type == 'buttonsResponseMessage') ? info.message.buttonsResponseMessage.selectedButtonId : (type == 'listResponseMessage') ? info.message.listResponseMessage.singleSelectReply.selectedRowId : (type == 'templateButtonReplyMessage') ? info.message.templateButtonReplyMessage.selectedId : (type === 'messageContextInfo') ? (info.message.buttonsResponseMessage?.selectedButtonId || info.message.listResponseMessage?.singleSelectReply.selectedRowId || info.text) : ''
 const args = body.trim().split(/ +/).slice(1)
 const isCmd = body.startsWith(prefixo)
 const comando = isCmd ? body.slice(1).trim().split(/ +/).shift().toLocaleLowerCase() : null
@@ -109,8 +101,6 @@ bady = (type === "conversation") ? info.message.conversation : (type == "imageMe
 
 // Budy
 budy = (type === "conversation") ? info.message.conversation : (type === "extendedTextMessage") ? info.message.extendedTextMessage.text : ""
-
-//===
 
 button = (type == "buttonsResponseMessage") ? info.message.buttonsResponseMessage.selectedDisplayText : ""
 button = (type == "buttonsResponseMessage") ? info.message.buttonsResponseMessage.selectedButtonId : ""
@@ -240,23 +230,23 @@ const isQuotedLocation = type === "extendedTextMessage" && content.includes("loc
 const isQuotedProduct = type === "extendedTextMessage" && content.includes("productMessage")
 
 // Comando no pv
-if (!isGroup && isCmd && sender) console.log(`\x1b[1;37m \n\x1b[1;37m  Número: ${color(sender.split("@")[0])}\n\x1b[1;37m  Data: ${color(hora)}\n\x1b[1;37m  Comando: ${color(comando)}\n\x1b[1;37m  Palavras: ${color(args.length)}\n\x1b[1;37m`)
+if (!isGroup && isCmd && sender) console.log(`\x1b[1;37m \n\x1b[1;37m  Número: ${color(sender.split("@")[0])}\n\x1b[1;37m  Data: ${color(moment.tz(process.env.TimeZone).format("HH:mm:ss"))}\n\x1b[1;37m  Comando: ${color(comando)}\n\x1b[1;37m  Palavras: ${color(args.length)}\n\x1b[1;37m`)
 
 // Mensagem no pv
-if (!isGroup && !isCmd && sender) console.log(`\x1b[1;37m \n\x1b[1;37m  Número: ${color(sender.split("@")[0])}\n\x1b[1;37m  Data: ${color(hora)}\n\x1b[1;37m  Comando: Não\n\x1b[1;37m  Palavras: ${color(argis.length)}\n\x1b[1;37m`)
+if (!isGroup && !isCmd && sender) console.log(`\x1b[1;37m \n\x1b[1;37m  Número: ${color(sender.split("@")[0])}\n\x1b[1;37m  Data: ${color(moment.tz(process.env.TimeZone).format("HH:mm:ss"))}\n\x1b[1;37m  Comando: Não\n\x1b[1;37m  Palavras: ${color(argis.length)}\n\x1b[1;37m`)
 
 // Comando em grupo
-if (isCmd && isGroup && sender) console.log(`\x1b[1;37m \n\x1b[1;37m  Número: ${color(sender.split("@")[0])}\n\x1b[1;37m  Data: ${color(hora)}\n\x1b[1;37m  Comando: ${color(comando)}\n\x1b[1;37m  Palavras: ${color(args.length)}\n\x1b[1;37m  Grupo: ${color(groupName)}\n\x1b[1;37m`)
+if (isCmd && isGroup && sender) console.log(`\x1b[1;37m \n\x1b[1;37m  Número: ${color(sender.split("@")[0])}\n\x1b[1;37m  Data: ${color(moment.tz(process.env.TimeZone).format("HH:mm:ss"))}\n\x1b[1;37m  Comando: ${color(comando)}\n\x1b[1;37m  Palavras: ${color(args.length)}\n\x1b[1;37m  Grupo: ${color(groupName)}\n\x1b[1;37m`)
 
 // Mensagem em grupo
-if (!isCmd && isGroup && sender) console.log(`\x1b[1;37m \n\x1b[1;37m  Número: ${color(sender.split("@")[0])}\n\x1b[1;37m  Data: ${color(hora)}\n\x1b[1;37m  Comando: Não\n\x1b[1;37m  Palavras: ${color(argis.length)}\n\x1b[1;37m  Grupo: ${color(groupName)}\n\x1b[1;37m`)
+if (!isCmd && isGroup && sender) console.log(`\x1b[1;37m \n\x1b[1;37m  Número: ${color(sender.split("@")[0])}\n\x1b[1;37m  Data: ${color(moment.tz(process.env.TimeZone).format("HH:mm:ss"))}\n\x1b[1;37m  Comando: Não\n\x1b[1;37m  Palavras: ${color(argis.length)}\n\x1b[1;37m  Grupo: ${color(groupName)}\n\x1b[1;37m`)
 
 // Começo dos comandos com prefix
 switch(comando) {
 
 case "menu":
    if(!isGroup) return enviar(resposta.grupo)
-   enviar(`${menu(prefixo, nomeBot, numeroDono, nomeDono, hora, data, pushname, sender.split("@")[0])}`)
+   enviar(`${menu(prefixo, nomeBot, numeroDono, nomeDono, moment.tz(process.env.TimeZone).format("HH:mm:ss"), moment.tz(process.env.TimeZone).format("DD/MM/YY"), pushname, sender.split("@")[0])}`)
    
    /*   
       =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -272,7 +262,7 @@ case "menu":
 
       × Você Também Pode Executar Sem Uma Variável, Basta Troca-lo Por Esse Comando:
       
-      cooh.sendMessage(from, { text: `${menu(prefixo, nomeBot, numeroDono, nomeDono, hora, data, pushname, sender.split("@")[0])}` }, { quoted: info })
+      cooh.sendMessage(from, { text: `${menu(prefixo, nomeBot, numeroDono, nomeDono, moment.tz(process.env.TimeZone).format("HH:mm:ss"), moment.tz(process.env.TimeZone).format("DD/MM/YY"), pushname, sender.split("@")[0])}` }, { quoted: info })
       
       =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    */
@@ -316,10 +306,5 @@ reconnect.stop()
 starting.stop()
 console.log(mylog("Servidor Pronto ✓"))
 var shouldReconnect = (lastDisconnect.error.Boom)?.output?.statusCode !== DisconnectReason.loggedOut  
-
-startCooh()
-}
-if(update.isNewLogin) {
-startCooh()
 }})}
 startCooh()

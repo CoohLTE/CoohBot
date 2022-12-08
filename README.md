@@ -6,5 +6,5 @@
 </p>
 
 <h4 align="center">
-	:warning: Projeto Em Construção! :warning:
+	:warning: Base Em Beta! :warning:
 </h4>
