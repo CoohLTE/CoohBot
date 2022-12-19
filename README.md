@@ -1,10 +1,7 @@
-<h1 align="center">CoohBot</h1>
 <p align="center">
+   <h1>CoohBot</h1>
 	<a href="https://youtube.com/c/@CoohCooh">
 		<img alt="CoohCooh" src="https://img.shields.io/youtube/channel/subscribers/UCI7ybmuXo08zI9cZX6dA_nA?label=Meu%20Canal&logo=Youtube&style=social"/>
 	</a>
 </p>
-
-<h4 align="center">
-	:warning: Base Em Beta! :warning:
-</h4>
+> _:warning: Base Em Beta! :warning:_

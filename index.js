@@ -3,9 +3,11 @@ const {
 default: makeWASocket,
 makeInMemoryStore,
 useSingleFileAuthState,
-BufferJSON, 
-DisconnectReason, 
-fetchLatestBaileysVersion,
+BufferJSON,
+useMultiFileAuthState,
+DisconnectReason,
+WA_DEFAULT_EPHEMERAL,
+Browsers,
 downloadContentFromMessage,
 delay
 } = require("@adiwajshing/baileys")
@@ -52,15 +54,15 @@ keys: initInMemoryKeyStore(value.keys)
 return state
 }
 
-const { state, saveState } = useSingleFileAuthState("./qr-code.json")
+const { state, saveCreds } = await useMultiFileAuthState("./znatsuqrcode")
 const { version } = require(`./Database/Json/Other/baileys_version.json`)
 console.log(banner.string)
 console.log(mylog("CONECTADO COM SUCESSO!!"))
 const cooh = makeWASocket({
-version,  
-logger: P({ level: "silent"}),
+version,
 printQRInTerminal: true,
-auth: state
+auth: state,
+browser: Browsers.macOS("Desktop")
 })
 store.bind(cooh.ev)
 
@@ -72,7 +74,7 @@ console.log("Tem conversas", store.chats.all())
 cooh.ev.on("contacts.set", () => {
 console.log("Tem contatos", Object.values(store.contacts))
 })
-cooh.ev.on("creds.update", saveState)
+cooh.ev.on("creds.update", saveCreds)
 
 
 // Chat update
@@ -165,14 +167,14 @@ const groupMembers = isGroup ? groupMetadata.participants : ""
 const groupAdmins = isGroup ? getGroupAdmins(groupMembers) : ""
 
 resposta = {
-espere: "[⚙️] Aguarde...enviando [❗]",
-grupo: "[⚙️] Esse comando só pode ser usado em grupo [❗]",
-privado: "[⚙️] Esse comando só pode ser usado no privado [❗]",
-adm: "[⚙️] Esse comando só pode ser usado por administradores de grupo [❗]",
-botadm: " [⚙️] Este comando só pode ser usado quando o bot se torna administrador [❗]",
-registro: `[⚙️️] Você não se registrou utilize ${prefixo}rg para se registrar [❗]`,
-norg: "[⚙️️] Você ja está registrado [❗]",
-erro: "[⚙️] Error, tente novamente mais tarde [❗]"
+espere: " Aguarde...enviando !",
+grupo: " Esse comando só pode ser usado em grupo !",
+privado: " Esse comando só pode ser usado no privado !",
+adm: " Esse comando só pode ser usado por administradores de grupo !",
+botadm: "  Este comando só pode ser usado quando o bot se torna administrador !",
+registro: ` Você não se registrou utilize ${prefixo}rg para se registrar !`,
+norg: " Você ja está registrado !",
+erro: " Error, tente novamente mais tarde !"
 }
 
 const verificado = {"key": {"fromMe": false,"participant":"0@s.whatsapp.net", "remoteJid": "552796100962@g.us" }, "message": {orderMessage: {itemCount: 0,status: 4, thumbnail: fs.readFileSync(`./Database/Fotos/verificado.png`) ,message: `Nick : ${pushname}`,surface: 100, sellerJid: "0@s.whatsapp.net"}}}
